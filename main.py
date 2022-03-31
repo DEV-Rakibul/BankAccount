@@ -1,51 +1,136 @@
-class BankAccount:
-    def __init__(self, username, pin, usernames, pins):
+from bank import BankAccount
 
-        self.username = username
-        self.pin = pin
-        self.usernames = usernames
-        self.pins = pins
-        self.balance = 0
+blank = "                                         "
+usernames = []
+pins = []
 
-    def deposits(self):
 
-        print("You can only print in 10s.")
-        print("                           ")
+def account_maker(usernames, pins, blank):
 
-        deposit_amount = int(input("How much are you depositing: $"))
+    def check(username):
 
-        while (deposit_amount % 10) != 0:
-            print("Invalid amount")
-            print("                           ")
-            deposit_amount = int(input("How much are you depositing: $"))
+        digits = 0
+        length = len(username)
 
-        self.balance += deposit_amount
+        while digits == 0 and (len(username)) < 8:
+            print("Username must contain 8 or more characters and at least 1 digit")
+            for i in range(len(username)):
+                if username[i].isdigit():
+                    digits += 1
+            username = input("Enter the username again: ")
 
-        return self.balance
+        return username
 
-    def withdraw(self):
-        withdraw_amnt = int(input("How much are you withdrawing: $"))
+    username = input("Create a username: ")
 
-        money_left = self.balance - withdraw_amnt
-        if money_left < 0:
-            print("Not enough money!")
-            print("you have $", self.balance, "in your account")
-            amount = int(input("Enter amount withdrawing: $"))
-        else:
-            self.balance -= withdraw_amnt
+    check(username)
 
-    def get_balance(self):
-        print(self.username, "you have $", self.balance, "in your account")
+    pin = int(input("Create a 4 digit pin: "))
 
-    def change_pin(self):
-        new_pin = int(input("Enter the new pin: "))
+    while len(str(pin)) != 4:
+        pin = int(input("Enter a 4 digit code: "))
 
-        while len(str(new_pin)) != 4:
-            new_pin = int(input("Enter a 4 digit code: "))
+    usernames.append(username)
+    pins.append(pin)
 
-        for i in range(len(self.usernames)):
-            if self.usernames[i] == self.username and self.pins[i] == self.pin:
-                self.pins[i] = new_pin
-                print("Pin has been changed.")
+    print("You successfully created an account,you can now login! *bringing you back to the main page* please wait...")
+    print(blank)
+    main(usernames, pins, blank)
 
-        return self.pins
+    return username, pin
+
+
+def login(usernames, pins, blank):
+    logged = False
+
+    tries = 3
+
+    while not logged:
+        username = input("Enter your username: ")
+        pin = int(input("Enter your pin: "))
+
+        for i in range(len(usernames)):
+            if tries > 0:
+                if username == usernames[i] and pin == pins[i]:
+                    print("You successfully logged in.")
+                    print(blank)
+                    logged = True
+
+                elif tries > 0:
+                    print("Invalid details. Please Try Again")
+                    tries -= 1
+                else:
+                    if tries == 0:
+                        print("You have entered the wrong details 3 times in a row. Brining you back to the menu...")
+                        print(blank)
+
+                        main(usernames, pins)
+
+    a1 = BankAccount(username, pin, usernames, pins)
+
+    return True, username, pin, a1
+
+
+def main(usernames, pins, blank):
+
+    print("Welcome to The Rakibul Bank ltd. ")
+
+    exist = input("Do you already have an account with us? [Y/N]: ").upper()
+
+    while exist != "Y":
+
+        if exist == "N":
+            account_maker(usernames, pins, blank)
+
+        elif exist != "Y":
+            print("Invalid Input. Please try again.")
+
+    logged_in, username, pin, a1 = login(usernames, pins, blank)
+
+    def logged(logged_in, username, pin, a1):
+
+        if logged_in is True:
+
+            valid_option = False
+            print(blank)
+            print("""
+            1. Check Balance
+            2. Deposit Money
+            3. Withdraw Money
+            4. Change Pin
+            """)
+            print(blank)
+
+            while not valid_option:
+
+                option = int(input("Please Enter An Option: "))
+
+                if option == 1:
+                    a1.get_balance()
+                    valid_option = True
+                elif option == 2:
+                    a1.deposits()
+                    valid_option = True
+                elif option == 3:
+                    a1.withdraw()
+                    valid_option = True
+                elif option == 4:
+                    a1.change_pin()
+                    valid_option = True
+                else:
+                    print("Invalid Option. Please Try Again")
+                    valid_option = False
+
+            user_choice = input("Do you want to go back the menu or log out [M/L]: ").upper()
+
+            if user_choice == "M":
+                logged(logged_in, username, pin, a1)
+            elif user_choice == "L":
+                main(usernames, pins, blank)
+
+        logged(logged_in, username, pin, a1)
+
+    logged(logged_in, username, pin, a1)
+
+
+main(usernames, pins, blank)
